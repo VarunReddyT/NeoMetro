@@ -16,7 +16,7 @@ const isTokenValid = (token) => {
 
 export default function ProtectedRoute({ children }) {
     const dispatch = useDispatch();
-    const token = localStorage.getItem("metroToken");
+    const token = useSelector((state) => state.auth.user?.token);
     const navigate = useNavigate();
     const [showAlert, setShowAlert] = useState(false);
     useEffect(() => {

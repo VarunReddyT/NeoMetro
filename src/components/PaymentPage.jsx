@@ -3,6 +3,8 @@ import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addBooking } from "./features/bookingSlicer";
 
 export default function PaymentPage() {
   const stripe = useStripe();
@@ -13,6 +15,7 @@ export default function PaymentPage() {
   const [qrCode, setQrCode] = useState("");
   const booking = useSelector((state) => state.booking.booking[0]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const generateTransactionId = (paymentMode) => {
     const timestamp = new Date().toISOString().replace(/^20/, '').replace(/[:-]/g, '').replace(/\.\d{3}Z$/, 'Z');
@@ -22,16 +25,17 @@ export default function PaymentPage() {
   };
 
   const getQrCode = async () => {
-    try{
+    try {
       const qrResponse = await axios.get('https://neo-metro-flask.vercel.app/qrcode/ticket', {
         params: {
           start: booking.source,
           end: booking.destination,
         }
       });
+      console.log(qrResponse.data);
       setQrCode(qrResponse.data.qrcode);
     }
-    catch(e){
+    catch (e) {
       console.error(e);
     }
   }
@@ -46,19 +50,44 @@ export default function PaymentPage() {
     const transactionId = generateTransactionId("card");
     await getQrCode();
 
+    dispatch(addBooking({ qrCode : qrCode, transactionId : transactionId }));
+
     const { paymentMethod, error } = await stripe.createPaymentMethod({
       type: "card",
       card: elements.getElement(CardElement),
       billing_details: { email },
     });
 
-    setLoading(false);
+
 
     if (error) {
       alert(error.message);
+      setLoading(false);
     } else {
       console.log("PaymentMethod:", paymentMethod);
-      try{
+      try {
+       /* The commented code block is using `Promise.all` to make multiple asynchronous requests in
+       parallel. It is attempting to make two POST requests using `axios.post` to different
+       endpoints: */
+        // const [ticketResponse, subsidPostResponse] = await Promise.all([
+        //   axios.post('https://neo-metro-backend.vercel.app/api/tickets/bookedticket', {
+        //     username: booking.username,
+        //     source: booking.source,
+        //     destination: booking.destination,
+        //     tickets: booking.tickets,
+        //     fare: booking.fare,
+        //     distance: booking.distance,
+        //     transactionId: transactionId,
+        //     paymentMode: "card",
+        //     qrCode: qrCode,
+        //     journeyDate: booking.journeyDate
+        //   }),
+        //   axios.post('https://neo-metro-backend.vercel.app/api/subsid/trigger', {
+        //     distinct_id: booking.username,
+        //     source: booking.source,
+        //     destination: booking.destination
+        //   })
+        // ]);
         await axios.post('https://neo-metro-backend.vercel.app/api/tickets/bookedticket', {
           username: booking.username,
           source: booking.source,
@@ -71,9 +100,12 @@ export default function PaymentPage() {
           qrCode: qrCode,
           journeyDate: booking.journeyDate
         });
-        navigate("/");
+        
+        setLoading(false);
+        navigate("/ticket-confirmation");
       }
-      catch(e){
+      catch (e) {
+        setLoading(false);
         console.error(e);
       }
     }

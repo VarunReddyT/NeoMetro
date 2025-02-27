@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 export default function Home() {
     return (
-        <section className="">
+        <div>
             <div className="container mx-auto flex flex-col justify-center p-6 px-20 lg:flex-row lg:justify-between">
                 <div className="flex flex-col justify-center p-6 text-center rounded-sm lg:max-w-md xl:max-w-lg lg:text-left">
                     <h1 className="text-4xl sm:text-5xl font-bold leading-none">
@@ -23,10 +23,10 @@ export default function Home() {
                     <img
                         src="/metro2.png"
                         alt="Metro"
-                        className="object-contain min-w-[300px] w-[450px] sm:w-[500px] lg:w-[550px] xl:w-[600px] 2xl:w-[650px]"
+                        className="object-contain min-w-[400px] w-[500px] sm:w-[550px] lg:w-[600px] xl:w-[650px] 2xl:w-[700px]"
                     />
                 </div>
             </div>
-        </section>
+        </div>
     );
 }

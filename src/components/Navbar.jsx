@@ -4,12 +4,15 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { logout } from "./features/authSlicer";
 import { useNavigate } from "react-router-dom";
+// import SuprSendInbox from '@suprsend/react-inbox'
+import axios from "axios";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+    const [isAuthenticated, setIsAuthenticated] = useState(useSelector((state) => state.auth.isAuthenticated));
     const userName = useSelector((state) => state.auth.user?.username);
+    // const [subscriberId, setSubscriberId] = useState();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const toggleProfileDropdown = () => {
@@ -30,6 +33,21 @@ export default function Navbar() {
     useEffect(() => {
         setIsProfileDropdownOpen(false);
     }, [window.location.pathname]);
+
+    // useEffect(() => {
+    //     const generateSubscriberId = async () => {
+    //         if (!isAuthenticated) return;
+    //         try {
+    //             const subscriberResponse = await axios.post('https://metro-backend-eight.vercel.app/api/subsid/subsId_generate', { distinct_id: userName });
+    //             console.log(subscriberResponse);
+    //             setSubscriberId(subscriberResponse.data);
+    //         } catch (err) {
+    //             console.log('Error generating subscriber id:', err);
+    //         }
+    //     };
+
+    //     generateSubscriberId();
+    // }, [userName, isAuthenticated]);
 
     const handleLogout = () => {
         dispatch(logout());
@@ -70,8 +88,29 @@ export default function Navbar() {
                         Login/Register
                     </Link>
                 ) : (
-                    <div className="relative">
-                        <div className="flex items-center space-x-2 cursor-pointer" onClick={toggleProfileDropdown}>
+                    <div className="relative flex items-center space-x-2">
+                        {/* <SuprSendInbox
+                            theme={{
+                                badge: { backgroundColor: 'pink', color: 'black'}, 
+                                bell: { color: 'white' },
+                                header: {
+                                    container: { backgroundColor: '#0099ff',padding: '10px' },
+                                    headertext: { color: 'black' },
+                                    markAllReadText: { color: 'black', fontWeight: 'bold' }
+                                },
+                                notification: {
+                                    actions: { container: { hoverBackgroundColor: '#349beb' } },
+                                    expiresText: { color: 'red' },
+                                    actionsMenuIcon: { color: 'blue' },
+                                    unreadBackgroundColor: '#d2e8f7'
+                                },
+                            }}
+                            themeType='light'
+                            workspaceKey={import.meta.env.VITE_API_SUPRSEND_WORKSPACE_KEY}
+                            subscriberId={subscriberId}
+                            distinctId={userName}
+                        /> */}
+                        <div className="flex items-center space-x-2 cursor-pointer mt-1" onClick={toggleProfileDropdown}>
                             <span className="text-white">
                                 {userName.charAt(0).toUpperCase() + userName.slice(1)}
                             </span>
@@ -80,7 +119,7 @@ export default function Navbar() {
                             </svg>
                         </div>
                         {isProfileDropdownOpen && (
-                            <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50 profile-dropdown">
+                            <div className="absolute top-1/2 right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50 profile-dropdown">
                                 <Link to="/profile" className="block px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
                                     Profile
                                 </Link>
@@ -143,10 +182,6 @@ export default function Navbar() {
                     ) : (
                         <li>
                             <div className="flex items-center space-x-2 cursor-pointer" onClick={toggleProfileDropdown}>
-                                <span className="text-white">{userName}</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="size-9">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                </svg>
                             </div>
                             {isProfileDropdownOpen && (
                                 <div className="mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50">
