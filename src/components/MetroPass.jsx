@@ -17,7 +17,7 @@ export default function MetroPass() {
     setSubmitted(true);
     setLoading(true);
     try {
-      const response = await axios.get("https://metro-murex.vercel.app/qrcode/metropass", {
+      const response = await axios.get("https://neo-metro-flask.vercel.app/qrcode/metropass", {
         params: { name, email },
       });
       setQrCode(response.data.qrcode);

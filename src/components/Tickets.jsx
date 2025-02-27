@@ -25,7 +25,7 @@ export default function Tickets() {
             try {
                 const encodedSource = encodeURIComponent(source);
                 const encodedDestination = encodeURIComponent(destination);
-                const response = await axios.get(`https://metro-murex.vercel.app/path/${encodedSource}/${encodedDestination}`);
+                const response = await axios.get(`https://neo-metro-flask.vercel.app/path/${encodedSource}/${encodedDestination}`);
                 setFare(response.data.fare);
                 setDistance(response.data.distance);
             } catch (e) {

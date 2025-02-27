@@ -23,7 +23,7 @@ export default function Compare() {
         setTotalExpensesV(totalExpenses.toFixed(2));
         try {
             const response = await axios.get(
-                `https://metro-murex.vercel.app/path/${source}/${destination}`
+                `https://neo-metro-flask.vercel.app/path/${source}/${destination}`
             );
             const fareValue = response.data.fare;
             setFare(fareValue);

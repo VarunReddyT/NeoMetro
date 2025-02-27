@@ -23,7 +23,7 @@ export default function PaymentPage() {
 
   const getQrCode = async () => {
     try{
-      const qrResponse = await axios.get('https://metro-murex.vercel.app/qrcode/ticket', {
+      const qrResponse = await axios.get('https://neo-metro-flask.vercel.app/qrcode/ticket', {
         params: {
           start: booking.source,
           end: booking.destination,
@@ -59,7 +59,7 @@ export default function PaymentPage() {
     } else {
       console.log("PaymentMethod:", paymentMethod);
       try{
-        await axios.post('https://metro-backend-eight.vercel.app/api/tickets/bookedticket', {
+        await axios.post('https://neo-metro-backend.vercel.app/api/tickets/bookedticket', {
           username: booking.username,
           source: booking.source,
           destination: booking.destination,

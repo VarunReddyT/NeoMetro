@@ -15,7 +15,7 @@ export default function Register() {
         e.preventDefault();
         setLoader(true);
         try {
-            await axios.post("https://metro-backend-eight.vercel.app/api/users/register", {
+            await axios.post("https://neo-metro-backend.vercel.app/api/users/register", {
                 name,
                 username,
                 password,

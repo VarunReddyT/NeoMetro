@@ -16,7 +16,7 @@ export default function Fares() {
     setLoader(true);
     try {
       const response = await axios.get(
-        `https://metro-murex.vercel.app/path/${encodeURIComponent(source)}/${encodeURIComponent(destination)}`
+        `https://neo-metro-flask.vercel.app/path/${encodeURIComponent(source)}/${encodeURIComponent(destination)}`
       );
       setPath(response.data.path);
       setFare(response.data.fare);
