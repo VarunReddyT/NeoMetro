@@ -161,30 +161,32 @@ router.post('/:username/generatemetropass', async (req, res) => {
     }
 
     try {
+        const user = await userschema.findOne({ username });
+        if (!user) {
+            return res.status(404).send('User not found.');
+        }
+
         const qrCodeResponse = await axios.get("https://neo-metro-flask.vercel.app/qrcode/metropass", {
             params: { name, email },
         });
         const qrCode = qrCodeResponse.data.qrcode;
+
         const validFrom = new Date();
         const validTo = new Date();
         validTo.setMonth(validTo.getMonth() + 3);
-        await userschema.updateOne(
-            { username },
-            {
-                $set: {
-                    metroPass: {
-                        qrCode,
-                        validFrom,
-                        validTo,
-                    },
-                },
-            }
-        );
+
+        user.metroPass = {
+            qrCode,
+            validFrom,
+            validTo,
+        };
+
+        await user.save();
 
         res.status(200).send({ qrCode, validFrom, validTo });
     } catch (err) {
-        console.error('Error generating metro pass:', err);
-        res.status(500).send('Error generating metro pass. Please try again.');
+        console.error('Error generating/renewing metro pass:', err);
+        res.status(500).send('Error generating/renewing metro pass. Please try again.');
     }
 });
 
@@ -210,4 +212,5 @@ router.get('/:username/checkmetropass', async (req, res) => {
         res.status(500).send('Error checking metro pass. Please try again.');
     }
 });
+
 module.exports = router;
