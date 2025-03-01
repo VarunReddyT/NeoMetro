@@ -13,6 +13,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import PaymentPage from "./components/PaymentPage";
 import TicketConfirmation from "./components/TicketConfirmation";
 import Profile from "./components/Profile";
+import NotFound from "./components/NotFound";
 
 const stripePromise = loadStripe(import.meta.env.VITE_API_STRIPE_TEST);
 
@@ -26,6 +27,7 @@ function App() {
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
         <Route path='/compare' element={<Compare />} />
+        <Route path='/*' element={<NotFound />} />
         <Route path='/metro-pass' element={
           <ProtectedRoute>
             <MetroPass />
