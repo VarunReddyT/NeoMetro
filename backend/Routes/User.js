@@ -3,7 +3,7 @@ const router = express.Router();
 const userschema = require('../schema/UserSchema.js');
 const jwt = require('jsonwebtoken');
 const bycrypt = require('bcrypt');
-
+const axios = require('axios');
 router.post('/register', async (req, res) => {
     const { name, username, password, gmail, mobilenumber } = req.body;
     if (!username || !password || !gmail || !mobilenumber || !name) {

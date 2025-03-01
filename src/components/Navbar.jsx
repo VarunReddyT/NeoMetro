@@ -16,18 +16,18 @@ export default function Navbar() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        async function getnotifications(){
-        if (isAuthenticated) {
-            await axios.get(`https://neo-metro-backend.vercel.app/api/users/${userName}/getnotifications`)
-                .then(response => {
-                    setNotifications(response.data);
-                })
-                .catch(error => {
-                    console.error("Error fetching notifications:", error);
-                });
+        async function getnotifications() {
+            if (isAuthenticated) {
+                await axios.get(`https://neo-metro-backend.vercel.app/api/users/${userName}/getnotifications`)
+                    .then(response => {
+                        setNotifications(response.data);
+                    })
+                    .catch(error => {
+                        console.error("Error fetching notifications:", error);
+                    });
+            }
         }
-    }
-    getnotifications();
+        getnotifications();
     }, [isAuthenticated]);
 
     const toggleProfileDropdown = () => {
@@ -114,9 +114,9 @@ export default function Navbar() {
                                 className="text-white focus:outline-none relative"
                             >
                                 <i className="fas fa-bell text-xl"></i>
-                                {notifications.length > 0 && (
-                                    <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">!</span>
-                                )}
+                                {notifications.length > 0 && notifications.filter(notification => !notification.read).length > 0 && (
+                                        <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">!</span>
+                                    )}
                             </button>
                             {isNotificationDropdownOpen && (
                                 <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50 notification-dropdown">
