@@ -12,10 +12,10 @@ export default function MetroPass() {
   const [submitted, setSubmitted] = useState(false);
   const [validPass, setValidPass] = useState(null);
   const [validLoading, setValidLoading] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
 
-  // Check for valid metro pass on page load
   useEffect(() => {
     async function checkMetroPass() {
       if (user?.username) {
@@ -25,7 +25,14 @@ export default function MetroPass() {
           );
           if (response.data) {
             setValidPass(response.data);
-            setSubmitted(true);
+
+            const today = new Date();
+            const validTo = new Date(response.data.validTo);
+            if (today > validTo) {
+              setIsExpired(true);
+            } else {
+              setSubmitted(true);
+            }
           }
           setValidLoading(false);
         } catch (err) {
@@ -50,19 +57,19 @@ export default function MetroPass() {
       );
       setQrCode(response.data.qrCode);
       setSubmitted(true);
+      setIsExpired(false);
     } catch (err) {
-      console.error("Error generating metro pass:", err);
+      console.error("Error generating/renewing metro pass:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Calculate remaining days for renewal
   const calculateRemainingDays = (validTo) => {
     const today = new Date();
     const validToDate = new Date(validTo);
     const timeDifference = validToDate - today;
-    return Math.ceil(timeDifference / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+    return Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
   };
 
   return (
@@ -71,15 +78,16 @@ export default function MetroPass() {
         This website is a development project and is not affiliated with Hyderabad Metro Rail. Do not use it for real bookings.
       </div>
       {validLoading ? (
-        // Centered loading spinner
         <div className="flex items-center justify-center min-h-screen">
           <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-blue-600"></div>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center p-4">
-          {!submitted ? (
+          {!submitted || isExpired ? (
             <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
-              <h2 className="text-2xl font-bold text-center text-blue-600 mb-4">Apply for Metro Pass</h2>
+              <h2 className="text-2xl font-bold text-center text-blue-600 mb-4">
+                {isExpired ? "Renew Your Metro Pass" : "Apply for Metro Pass"}
+              </h2>
               <div className="mb-4">
                 <label className="block text-gray-700 font-medium">Full Name</label>
                 <input type="text" className="w-full p-3 border border-gray-300 rounded-md" onChange={(e) => setName(e.target.value)} required />
@@ -93,7 +101,7 @@ export default function MetroPass() {
                 <input type="tel" className="w-full p-3 border border-gray-300 rounded-md" onChange={(e) => setPhone(e.target.value)} required />
               </div>
               <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-3 rounded-md hover:bg-blue-700">
-                Submit
+                {isExpired ? "Renew Pass" : "Submit"}
               </button>
             </form>
           ) : (

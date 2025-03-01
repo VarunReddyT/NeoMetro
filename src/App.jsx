@@ -12,6 +12,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import PaymentPage from "./components/PaymentPage";
 import TicketConfirmation from "./components/TicketConfirmation";
+import Profile from "./components/Profile";
 
 const stripePromise = loadStripe(import.meta.env.VITE_API_STRIPE_TEST);
 
@@ -45,6 +46,11 @@ function App() {
         <Route path='/ticket-confirmation' element={
           <ProtectedRoute>
             <TicketConfirmation />
+          </ProtectedRoute>
+        } />
+        <Route path='/profile' element={
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         } />
 

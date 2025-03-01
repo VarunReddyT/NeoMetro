@@ -166,9 +166,6 @@ export default function Navbar() {
                                     <Link to="/profile" className="block px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
                                         Profile
                                     </Link>
-                                    <Link to="/settings" className="block px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        Settings
-                                    </Link>
                                     <button className="block text-left w-full px-4 py-2 text-gray-800 dark:text-white hover:bg-red-700 dark:hover:bg-red-700" onClick={handleLogout}>
                                         Logout
                                     </button>
@@ -231,9 +228,6 @@ export default function Navbar() {
                                 <div className="mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50">
                                     <Link to="/profile" className="block px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
                                         Profile
-                                    </Link>
-                                    <Link to="/settings" className="block px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        Settings
                                     </Link>
                                     <button className="block w-full px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700" onClick={handleLogout}>
                                         Logout

@@ -24,6 +24,8 @@ export default function Home() {
                         src="/metro2.png"
                         alt="Metro"
                         className="object-contain min-w-[400px] w-[500px] sm:w-[550px] lg:w-[600px] xl:w-[650px] 2xl:w-[700px]"
+                        loading="lazy"
+                        
                     />
                 </div>
             </div>

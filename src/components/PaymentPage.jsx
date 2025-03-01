@@ -32,14 +32,13 @@ export default function PaymentPage() {
           end: booking.destination,
         }
       });
-      console.log(qrResponse.data);
       setQrCode(qrResponse.data.qrcode);
-    }
-    catch (e) {
+      return qrResponse.data.qrcode; 
+    } catch (e) {
       console.error(e);
+      return null; 
     }
-  }
-
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,9 +47,9 @@ export default function PaymentPage() {
     setLoading(true);
 
     const transactionId = generateTransactionId("card");
-    await getQrCode();
 
-    dispatch(addBooking({ qrCode : qrCode, transactionId : transactionId }));
+    const qrCode = await getQrCode();
+    dispatch(addBooking({ qrCode: qrCode, transactionId: transactionId }));
 
     const { paymentMethod, error } = await stripe.createPaymentMethod({
       type: "card",
@@ -58,36 +57,12 @@ export default function PaymentPage() {
       billing_details: { email },
     });
 
-
-
     if (error) {
       alert(error.message);
       setLoading(false);
     } else {
       console.log("PaymentMethod:", paymentMethod);
       try {
-       /* The commented code block is using `Promise.all` to make multiple asynchronous requests in
-       parallel. It is attempting to make two POST requests using `axios.post` to different
-       endpoints: */
-        // const [ticketResponse, subsidPostResponse] = await Promise.all([
-        //   axios.post('https://neo-metro-backend.vercel.app/api/tickets/bookedticket', {
-        //     username: booking.username,
-        //     source: booking.source,
-        //     destination: booking.destination,
-        //     tickets: booking.tickets,
-        //     fare: booking.fare,
-        //     distance: booking.distance,
-        //     transactionId: transactionId,
-        //     paymentMode: "card",
-        //     qrCode: qrCode,
-        //     journeyDate: booking.journeyDate
-        //   }),
-        //   axios.post('https://neo-metro-backend.vercel.app/api/subsid/trigger', {
-        //     distinct_id: booking.username,
-        //     source: booking.source,
-        //     destination: booking.destination
-        //   })
-        // ]);
         await axios.post('https://neo-metro-backend.vercel.app/api/tickets/bookedticket', {
           username: booking.username,
           source: booking.source,
@@ -100,11 +75,10 @@ export default function PaymentPage() {
           qrCode: qrCode,
           journeyDate: booking.journeyDate
         });
-        
+
         setLoading(false);
         navigate("/ticket-confirmation");
-      }
-      catch (e) {
+      } catch (e) {
         setLoading(false);
         console.error(e);
       }
