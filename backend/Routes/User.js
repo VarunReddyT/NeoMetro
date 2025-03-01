@@ -152,4 +152,62 @@ router.put(`/:username/markasread`, async (req, res) => {
 }
 );
 
+router.post('/:username/generatemetropass', async (req, res) => {
+    const { username } = req.params;
+    const { name, email, phone } = req.body;
+
+    if (!username || !name || !email || !phone) {
+        return res.status(400).send('Please provide all required fields.');
+    }
+
+    try {
+        const qrCodeResponse = await axios.get("https://neo-metro-flask.vercel.app/qrcode/metropass", {
+            params: { name, email },
+        });
+        const qrCode = qrCodeResponse.data.qrcode;
+        const validFrom = new Date();
+        const validTo = new Date();
+        validTo.setMonth(validTo.getMonth() + 3);
+        await userschema.updateOne(
+            { username },
+            {
+                $set: {
+                    metroPass: {
+                        qrCode,
+                        validFrom,
+                        validTo,
+                    },
+                },
+            }
+        );
+
+        res.status(200).send({ qrCode, validFrom, validTo });
+    } catch (err) {
+        console.error('Error generating metro pass:', err);
+        res.status(500).send('Error generating metro pass. Please try again.');
+    }
+});
+
+router.get('/:username/checkmetropass', async (req, res) => {
+    const { username } = req.params;
+
+    if (!username) {
+        return res.status(400).send('Please provide a username.');
+    }
+
+    try {
+        const user = await userschema.findOne({ username });
+        if (!user) {
+            return res.status(404).send('User not found.');
+        }
+        if (user.metroPass && new Date(user.metroPass.validTo) > new Date()) {
+            return res.status(200).send(user.metroPass);
+        }
+
+        res.status(404).send('No valid metro pass found.');
+    } catch (err) {
+        console.error('Error checking metro pass:', err);
+        res.status(500).send('Error checking metro pass. Please try again.');
+    }
+});
 module.exports = router;

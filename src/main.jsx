@@ -8,11 +8,11 @@ import { PersistGate } from "redux-persist/integration/react";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <App />
       </PersistGate>
     </Provider>
-  </StrictMode>,
+  // </StrictMode>,
 )

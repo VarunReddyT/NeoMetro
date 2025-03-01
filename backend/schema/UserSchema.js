@@ -45,6 +45,23 @@ const UserSchema = new Schema({
             }
         ],
         default : []
+    },
+    metroPass: {
+        type: {
+            qrCode: {
+                type: String,
+                required: true,
+            },
+            validFrom: {
+                type: Date,
+                required: true,
+            },
+            validTo: {
+                type: Date,
+                required: true,
+            },
+        },
+        default: null,
     }
 },{timestamps : true});
 

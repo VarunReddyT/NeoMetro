@@ -123,15 +123,15 @@ export default function Navbar() {
                                     <div className="p-4">
                                         <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Notifications</h3>
                                         {notifications.length > 0 ? (
-                                            notifications.map(notification => (
-                                                <div key={notification.id} className="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                                            notifications.map((notification) => (
+                                                <div key={notification._id} className="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded">
                                                     <p className="text-sm text-gray-700 dark:text-white">{notification.message}</p>
                                                     <p className="text-xs text-gray-500 dark:text-gray-400">
                                                         {new Date(notification.timestamp).toLocaleString()}
                                                     </p>
                                                     {!notification.read && (
                                                         <button
-                                                            onClick={() => markAsRead(notification.id)}
+                                                            onClick={() => markAsRead(notification._id)}
                                                             className="mt-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
                                                         >
                                                             Mark as Read
