@@ -6,20 +6,25 @@ export default function TicketConfirmation() {
     const ticketDetails = useSelector((state) => state.booking.booking[0]);
     const user = useSelector((state) => state.auth.user);
 
-    useEffect(async() => {
-        if (ticketDetails && user) {
-            const notification = {
-                message: `Your ticket from ${ticketDetails.source} to ${ticketDetails.destination} has been booked successfully.`,
-                read: false
-            };
-            await axios.put(`https://neo-metro-backend.vercel.app/api/users/${user.username}/addnotification`, notification)
-                .then(response => {
-                    console.log("Notification sent successfully:", response.data);
-                })
-                .catch(error => {
-                    console.error("Error sending notification:", error);
-                });
+    useEffect(() => {
+        async function addNotification() {
+            if (ticketDetails && user) {
+                const notification = {
+                    message: `Your ticket from ${ticketDetails.source} to ${ticketDetails.destination} has been booked successfully.`,
+                    read: false
+                };
+                try{
+                    await axios.put(`https://neo-metro-backend.vercel.app/api/users/${user.username}/addnotification`,
+                        notification
+                    );
+                    console.log('Notification sent successfully.');
+                }
+                catch (error) {
+                    console.error('Error sending notification:', error);
+                }
+            }
         }
+        addNotification();
     }, [ticketDetails, user]);
 
     return (

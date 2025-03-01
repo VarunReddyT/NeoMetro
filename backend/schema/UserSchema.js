@@ -40,7 +40,7 @@ const UserSchema = new Schema({
                 },
                 timestamp: {
                     type: Date,
-                    required: Date.now
+                    default : Date.now
                 }
             }
         ],

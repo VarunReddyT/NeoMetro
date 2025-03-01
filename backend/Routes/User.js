@@ -94,11 +94,17 @@ router.get('/getuser', async (req, res) => {
 
 router.put(`/:username/addnotification`, async (req, res) => {
     const {username} = req.params;
-    const {notification} = req.body;
-    if (!username || !notification) {
+    console.log(username);
+    console.log(req.body);
+    const {message} = req.body;
+    if (!username || !message) {
         return res.status(400).send('Please fill all the fields');
     }
     try{
+        const notification = {
+            message,
+            read: false
+        };
         await userschema.updateOne({username}, {$push: {notifications: notification}});
         res.status(200).send('Notification added successfully');
     }
@@ -133,8 +139,12 @@ router.put(`/:username/markasread`, async (req, res) => {
         return res.status(400).send('Please fill all the fields');
     }
     try{
-        await userschema.updateOne({username}, {$set: {[`notifications.${notificationId}.read`]: true}});
-        res.status(200).send('Notification marked as read');
+        await userschema.updateOne(
+            { username, 'notifications._id': notificationId },
+            { $set: { 'notifications.$.read': true } } 
+        );
+
+        res.status(200).send('Notification marked as read.');
     }
     catch(err){
         res.status(500).send('Error marking notification as read. Please try again.');

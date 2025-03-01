@@ -20,7 +20,7 @@ export default function Navbar() {
         if (isAuthenticated) {
             await axios.get(`https://neo-metro-backend.vercel.app/api/users/${userName}/getnotifications`)
                 .then(response => {
-                    setNotifications(response.data.notifications);
+                    setNotifications(response.data);
                 })
                 .catch(error => {
                     console.error("Error fetching notifications:", error);
@@ -114,7 +114,7 @@ export default function Navbar() {
                                 className="text-white focus:outline-none relative"
                             >
                                 <i className="fas fa-bell text-xl"></i>
-                                {notifications.some(notification => !notification.read) && (
+                                {notifications.length > 0 && (
                                     <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">!</span>
                                 )}
                             </button>
