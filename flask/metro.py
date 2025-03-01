@@ -155,7 +155,7 @@ def generate_qr_code(type):
     elif type == 'metropass':
         name = request.args.get('name')
         email = request.args.get('email')
-        data = "Name: {}\nEmail: {}\nPass Type: Metro Pass\nPass Validity: 30 days. This is a Metro Pass for development purposes".format(name, email)
+        data = "Name: {}\nEmail: {}\nPass Type: Metro Pass\nPass Validity: 3 months. This is a Metro Pass for development purposes".format(name, email)
     else:
         return jsonify({'error': 'Invalid QR code type'})
     qr = qrcode.QRCode(
