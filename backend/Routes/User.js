@@ -3,8 +3,6 @@ const router = express.Router();
 const userschema = require('../schema/UserSchema.js');
 const jwt = require('jsonwebtoken');
 const bycrypt = require('bcrypt');
-const {Suprsend} = require("@suprsend/node-sdk");
-const supr_client = new Suprsend(process.env.SUPRSEND_WORKSPACE_KEY, process.env.SUPRSEND_WORKSPACE_SECRET);
 
 router.post('/register', async (req, res) => {
     const { name, username, password, gmail, mobilenumber } = req.body;
@@ -16,10 +14,8 @@ router.post('/register', async (req, res) => {
 
     const user = new userschema({ name, username, password : hashPassword, gmail, mobilenumber });
 
-    const suprSendUser = supr_client.user.get_instance(username);
   
     try{
-        const response = suprSendUser.save()
         await user.save();
         console.log('User registered successfully');
         res.status(200).send('User registered successfully');
@@ -95,4 +91,55 @@ router.get('/getuser', async (req, res) => {
     }
 }
 );
+
+router.put(`/:username/addnotification`, async (req, res) => {
+    const {username} = req.params;
+    const {notification} = req.body;
+    if (!username || !notification) {
+        return res.status(400).send('Please fill all the fields');
+    }
+    try{
+        await userschema.updateOne({username}, {$push: {notifications: notification}});
+        res.status(200).send('Notification added successfully');
+    }
+    catch(err){
+        res.status(500).send('Error adding notification. Please try again.');
+    }
+}
+);
+
+router.get(`/:username/getnotifications`, async (req, res) => {
+    const {username} = req.params;
+    if (!username) {
+        return res.status(400).send('Please fill all the fields');
+    }
+    const user = await userschema.findOne({username});
+    if (!user) {
+        return res.status(400).send('No user found');
+    }
+    try{
+        res.send(user.notifications);
+    }
+    catch(err){
+        res.status(500).send('Error fetching notifications. Please try again.');
+    }
+}
+);
+
+router.put(`/:username/markasread`, async (req, res) => {
+    const {username} = req.params;
+    const {notificationId} = req.body;
+    if (!username || !notificationId) {
+        return res.status(400).send('Please fill all the fields');
+    }
+    try{
+        await userschema.updateOne({username}, {$set: {[`notifications.${notificationId}.read`]: true}});
+        res.status(200).send('Notification marked as read');
+    }
+    catch(err){
+        res.status(500).send('Error marking notification as read. Please try again.');
+    }
+}
+);
+
 module.exports = router;

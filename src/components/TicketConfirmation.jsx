@@ -4,7 +4,23 @@ import axios from "axios";
 
 export default function TicketConfirmation() {
     const ticketDetails = useSelector((state) => state.booking.booking[0]);
-    console.log(ticketDetails);
+    const user = useSelector((state) => state.auth.user);
+
+    useEffect(async() => {
+        if (ticketDetails && user) {
+            const notification = {
+                message: `Your ticket from ${ticketDetails.source} to ${ticketDetails.destination} has been booked successfully.`,
+                read: false
+            };
+            await axios.put(`https://neo-metro-backend.vercel.app/api/users/${user.username}/addnotification`, notification)
+                .then(response => {
+                    console.log("Notification sent successfully:", response.data);
+                })
+                .catch(error => {
+                    console.error("Error sending notification:", error);
+                });
+        }
+    }, [ticketDetails, user]);
 
     return (
         <div className="min-h-screen flex items-center justify-center p-6">
@@ -16,7 +32,7 @@ export default function TicketConfirmation() {
                     <div className="flex flex-col items-center justify-center">
                         {ticketDetails.qrCode ? (
                             <img
-                            src={`data:image/png;base64,${ticketDetails.qrCode}`} 
+                                src={`data:image/png;base64,${ticketDetails.qrCode}`}
                                 alt="QR Code"
                                 className="w-48 h-48"
                             />
@@ -48,8 +64,6 @@ export default function TicketConfirmation() {
                                 </p>
                             </div>
                         </div>
-
-                        
                     </div>
                 </div>
 
@@ -65,4 +79,4 @@ export default function TicketConfirmation() {
             </div>
         </div>
     );
-};
+}
