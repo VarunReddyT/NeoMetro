@@ -5,11 +5,36 @@ import networkx as nx
 import qrcode
 import base64
 from io import BytesIO
+import requests
+import supabase
+import google.generativeai as genai
+import os
+from dotenv import load_dotenv
+import re
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
 G = nx.Graph()
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("Supabase credentials are missing. Check your environment variables.")
+
+try:
+    supabase_client = supabase.create_client(SUPABASE_URL, SUPABASE_KEY)
+    stations_response = supabase_client.table("metro_stations").select("name").execute()
+    stations = [s["name"] for s in stations_response.data] if stations_response.data else []
+except Exception as e:
+    print(f"Error fetching stations from Supabase: {e}")
+    stations = [] 
+
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+model = genai.GenerativeModel("gemini-1.5-pro")
 
 stations = {
     ('Miyapur', 'Jntu'): 1.8,
@@ -113,6 +138,26 @@ def calculate_fare(dist):
     else:
         return 60
 
+def get_path(paths,start,end) :
+    mid = []
+    distances = [calculate_path_distance(G, path) for path in paths]
+    min_distance_index = distances.index(min(distances))
+    min_distance_path = paths[min_distance_index]
+    min_distance = distances[min_distance_index]
+    min_distance = round(min_distance, 2)
+    fare = calculate_fare(min_distance)
+    if "Ameerpet" in min_distance_path and start != "Ameerpet" and end != "Ameerpet":
+        mid.append("Ameerpet")
+    if "Mg Bus Station" in min_distance_path and start != "Mg Bus Station" and end != "Mg Bus Station":
+        mid.append("Mg Bus Station")
+    if "Parade Ground" in min_distance_path and start != "Parade Ground" and end != "Parade Ground":
+        mid.append("Parade Ground")
+    
+    if len(mid) == 0:
+        displayPath = start + " -> " + end
+    else:
+        displayPath = start + " -> " + " -> ".join(mid) + " -> "  + end
+    return jsonify({'path': displayPath, 'distance': min_distance, 'fare': fare})
 
 @app.route('/path/<start>/<end>')
 def find_path(start, end):
@@ -120,25 +165,7 @@ def find_path(start, end):
     end = unquote(end)
     paths = list(dfs_path(G, start, end))
     if paths:
-        mid = []
-        distances = [calculate_path_distance(G, path) for path in paths]
-        min_distance_index = distances.index(min(distances))
-        min_distance_path = paths[min_distance_index]
-        min_distance = distances[min_distance_index]
-        min_distance = round(min_distance, 2)
-        fare = calculate_fare(min_distance)
-        if "Ameerpet" in min_distance_path and start != "Ameerpet" and end != "Ameerpet":
-            mid.append("Ameerpet")
-        if "Mg Bus Station" in min_distance_path and start != "Mg Bus Station" and end != "Mg Bus Station":
-            mid.append("Mg Bus Station")
-        if "Parade Ground" in min_distance_path and start != "Parade Ground" and end != "Parade Ground":
-            mid.append("Parade Ground")
-        
-        if len(mid) == 0:
-            displayPath = start + " -> " + end
-        else:
-            displayPath = start + " -> " + " -> ".join(mid) + " -> "  + end
-        return jsonify({'path': displayPath, 'distance': min_distance, 'fare': fare})
+        return get_path(paths,start,end)
             
     else:
         return jsonify({'error': 'No path found between {} and {}'.format(start, end)})
@@ -176,5 +203,57 @@ def generate_qr_code(type):
 
     return jsonify({'qrcode': img_str})
 
+def clean_response(text):
+    text = re.sub(r"\*+", "", text)
+    text = re.sub(r"_+", "", text) 
+    text = re.sub(r"\n+", " ", text) 
+    return text.strip()
+
+
+def generate_gemini_response(prompt):
+    response = model.generate_content(prompt)
+    if response and hasattr(response, "text"):
+        return clean_response(response.text)
+    return "No response generated."
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    data = request.json
+    user_query = data.get("query", "")
+    location = data.get("location", "")
+    stationsBody = data.get("stations", "")
+
+    # **Handle fare queries**
+    if stationsBody:
+        words = stationsBody.split(",")
+        
+        source, destination = words[0], words[1]
+        source_encoded = unquote(source)
+        destination_encoded = unquote(destination)
+
+        paths = list(dfs_path(G, source_encoded, destination_encoded))
+        if paths:
+            return get_path(paths, source_encoded, destination_encoded)
+        else:
+            return jsonify({'error': 'No path found between {} and {}'.format(source, destination)})
+
+    # **Handle places near a metro station**
+    if location:
+        if location in stations:
+            gemini_prompt = f"What are some famous places to visit near {location} Metro Station within a 5 km radius in Hyderabad? Provide a short and informative response."
+            places_info = generate_gemini_response(gemini_prompt)
+            return jsonify({"response": places_info if places_info else "No places found."})
+        else:
+            return jsonify({"response": "Please specify a valid metro station to find nearby places."})
+
+    # **Handle general queries**
+    result = generate_gemini_response(user_query + " If it is not related to the metro, please say that I am not sure about it. I can help you with metro-related queries.")
+    
+    if "not sure" in result:
+        return jsonify({"response": "I am not sure about that. I can help you with metro-related queries."})
+
+    return jsonify({"response": result})
+
 if __name__ == '__main__':
     app.run(debug=True,port=5000)
+
