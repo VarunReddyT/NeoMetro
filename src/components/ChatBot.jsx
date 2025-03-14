@@ -68,12 +68,17 @@ const ChatbotUI = () => {
       console.log(payload);
       const response = await axios.post("https://neo-metro-flask.vercel.app/chat", payload);
       console.log(response.data);
-      const botResponse = {
-        id: messages.length + 2,
-        text: response.data.reply || "This is a sample response from the chatbot.",
-        isBot: true
-      };
-
+      switch (selectedOption) {
+        case "Check Fares":
+          var botResponse = { id: messages.length + 2, text: `The fare from ${source} to ${destination} is ₹${response.data.fare}`, isBot: true };
+          break;
+        case "Nearest Places":
+          var botResponse = { id: messages.length + 2, text: response.data.response, isBot: true };
+          break;
+        default:
+          var botResponse = { id: messages.length + 2, text: response.data.response, isBot: true };
+      }
+  
       setMessages(prevMessages => [...prevMessages, botResponse]);
     } catch (error) {
       console.error(error);
