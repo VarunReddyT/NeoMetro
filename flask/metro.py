@@ -238,15 +238,11 @@ def chat():
 
     # **Handle places near a metro station**
     if location:
-        if location in stations:
-            gemini_prompt = f"What are some famous places to visit near {location} Metro Station within a 5 km radius in Hyderabad? Provide a short and informative response."
-            places_info = generate_gemini_response(gemini_prompt)
-            return jsonify({"response": places_info if places_info else "No places found."})
-        else:
-            return jsonify({"response": "Please specify a valid metro station to find nearby places."})
-
+        gemini_prompt = f"What are some famous places to visit near {location} Metro Station or area within a 5 km radius in Hyderabad? Provide a short and informative response."
+        places_info = generate_gemini_response(gemini_prompt)
+        return jsonify({"response": places_info if places_info else "No places found."})
     # **Handle general queries**
-    result = generate_gemini_response(user_query + " If it is not related to the metro, please say that I am not sure about it. I can help you with metro-related queries.")
+    result = generate_gemini_response(user_query + ". Only answer if it is related to the metro rail. If it is not related to the metro, please reply as I am not sure about it. I can help you with metro-related queries.")
     
     if "not sure" in result:
         return jsonify({"response": "I am not sure about that. I can help you with metro-related queries."})
