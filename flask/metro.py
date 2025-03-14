@@ -225,9 +225,8 @@ def chat():
 
     # **Handle fare queries**
     if stationsBody:
-        words = stationsBody.split(",")
         
-        source, destination = words[0], words[1]
+        source, destination = stationsBody[0], stationsBody[1]
         source_encoded = unquote(source)
         destination_encoded = unquote(destination)
 

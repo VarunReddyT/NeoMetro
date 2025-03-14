@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import ChatbotUI from "./ChatBot";
 export default function Home() {
     return (
         <div>
@@ -29,6 +30,7 @@ export default function Home() {
                     />
                 </div>
             </div>
+            <ChatbotUI />
         </div>
     );
 }
