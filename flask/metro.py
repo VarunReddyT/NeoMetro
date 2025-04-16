@@ -6,7 +6,6 @@ import qrcode
 import base64
 from io import BytesIO
 import requests
-import supabase
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
@@ -18,20 +17,6 @@ app = Flask(__name__)
 CORS(app)
 
 G = nx.Graph()
-
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise ValueError("Supabase credentials are missing. Check your environment variables.")
-
-try:
-    supabase_client = supabase.create_client(SUPABASE_URL, SUPABASE_KEY)
-    stations_response = supabase_client.table("metro_stations").select("name").execute()
-    stations = [s["name"] for s in stations_response.data] if stations_response.data else []
-except Exception as e:
-    print(f"Error fetching stations from Supabase: {e}")
-    stations = [] 
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-1.5-pro")
@@ -95,9 +80,10 @@ stations = {
     ('Sulthan Bazaar', 'Mg Bus Station'): 0.7
 }
 
-
 for (start, end), distance in stations.items():
     G.add_edge(start, end, weight=distance)
+
+stations_list = list(G.nodes())
 
 def dfs_path(graph, start, goal):
     stack = [(start, [start])]
@@ -109,7 +95,6 @@ def dfs_path(graph, start, goal):
             else:
                 stack.append((next, path + [next]))
 
-
 def calculate_path_distance(graph, path):
     distance = 0
     for i in range(len(path) - 1):
@@ -117,11 +102,11 @@ def calculate_path_distance(graph, path):
     return distance
 
 def calculate_fare(dist):
-    if dist <=2 :
+    if dist <=2:
         return 10
-    elif dist>2 and dist <=4 :
+    elif dist>2 and dist <=4:
         return 15
-    elif dist>4 and dist<=6 :
+    elif dist>4 and dist<=6:
         return 25
     elif dist>6 and dist<=8:
         return 30
@@ -138,7 +123,7 @@ def calculate_fare(dist):
     else:
         return 60
 
-def get_path(paths,start,end) :
+def get_path(paths, start, end):
     mid = []
     distances = [calculate_path_distance(G, path) for path in paths]
     min_distance_index = distances.index(min(distances))
@@ -165,14 +150,16 @@ def find_path(start, end):
     end = unquote(end)
     paths = list(dfs_path(G, start, end))
     if paths:
-        return get_path(paths,start,end)
-            
+        return get_path(paths, start, end)
     else:
         return jsonify({'error': 'No path found between {} and {}'.format(start, end)})
 
+@app.route('/stations')
+def get_stations():
+    return jsonify({'stations': stations_list})
+
 @app.route('/qrcode/<type>')
 def generate_qr_code(type):
-    
     if type == 'ticket':
         start = request.args.get('start')
         end = request.args.get('end')
@@ -185,6 +172,7 @@ def generate_qr_code(type):
         data = "Name: {}\nEmail: {}\nPass Type: Metro Pass\nPass Validity: 3 months. This is a Metro Pass for development purposes".format(name, email)
     else:
         return jsonify({'error': 'Invalid QR code type'})
+    
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -209,7 +197,6 @@ def clean_response(text):
     text = re.sub(r"\n+", " ", text) 
     return text.strip()
 
-
 def generate_gemini_response(prompt):
     response = model.generate_content(prompt)
     if response and hasattr(response, "text"):
@@ -223,9 +210,7 @@ def chat():
     location = data.get("location", "")
     stationsBody = data.get("stations", "")
 
-    # **Handle fare queries**
     if stationsBody:
-        
         source, destination = stationsBody[0], stationsBody[1]
         source_encoded = unquote(source)
         destination_encoded = unquote(destination)
@@ -236,12 +221,11 @@ def chat():
         else:
             return jsonify({'error': 'No path found between {} and {}'.format(source, destination)})
 
-    # **Handle places near a metro station**
     if location:
         gemini_prompt = f"What are some famous places to visit near {location} Metro Station or area within a 5 km radius in Hyderabad? Provide a short and informative response."
         places_info = generate_gemini_response(gemini_prompt)
         return jsonify({"response": places_info if places_info else "No places found."})
-    # **Handle general queries**
+    
     result = generate_gemini_response(user_query + ". Only answer if it is related to the metro rail. If it is not related to the metro, please reply as I am not sure about it. I can help you with metro-related queries.")
     
     if "not sure" in result:
@@ -250,5 +234,4 @@ def chat():
     return jsonify({"response": result})
 
 if __name__ == '__main__':
-    app.run(debug=True,port=5000)
-
+    app.run(debug=True, port=5000)
