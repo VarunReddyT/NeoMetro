@@ -4,20 +4,38 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "./features/authSlicer";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import jwtDecode from "jwt-decode";
+
+const isTokenValid = (token) => {
+    if (!token) return false;
+    try {
+        const decoded = jwtDecode(token);
+        return decoded.exp * 1000 > Date.now();
+    } catch (error) {
+        return false;
+    }
+};
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
     const [notifications, setNotifications] = useState([]);
-    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+    const token = useSelector((state) => state.auth.user?.token);
     const userName = useSelector((state) => state.auth.user?.username);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
+        if (token && !isTokenValid(token)) {
+            dispatch(logout());
+            navigate("/login");
+        }
+    }, [token, dispatch, navigate]);
+
+    useEffect(() => {
         async function getnotifications() {
-            if (isAuthenticated) {
+            if (isTokenValid(token)) {
                 await axios.get(`https://neo-metro-backend.vercel.app/api/users/${userName}/getnotifications`)
                     .then(response => {
                         setNotifications(response.data);
@@ -28,7 +46,7 @@ export default function Navbar() {
             }
         }
         getnotifications();
-    }, [isAuthenticated]);
+    }, [token, isAuthenticated]);
 
     const toggleProfileDropdown = () => {
         setIsProfileDropdownOpen(!isProfileDropdownOpen);
@@ -107,7 +125,7 @@ export default function Navbar() {
                     </li>
                 </ul>
                 <div className="flex items-center space-x-4">
-                    {isAuthenticated && (
+                    {isTokenValid(token) && (
                         <div className="relative">
                             <button
                                 onClick={toggleNotificationDropdown}
@@ -147,7 +165,7 @@ export default function Navbar() {
                             )}
                         </div>
                     )}
-                    {!isAuthenticated ? (
+                    {!isTokenValid(token) ? (
                         <Link to="/login" className="hidden md:inline-block bg-gradient-to-r from-blue-500 to-violet-600 text-white px-6 py-2 rounded-full font-medium shadow-md hover:scale-105 transition-transform">
                             Login/Register
                         </Link>
@@ -195,47 +213,30 @@ export default function Navbar() {
             >
                 <ul className="flex flex-col items-center space-y-3">
                     <li>
-                        <Link to="/" className="px-6 py-2 text-gray-800 dark:text-white font-medium transition hover:text-violet-600">
+                        <Link to="/" className="px-6 py-2 text-gray-800 dark:text-white font-medium transition-all hover:text-blue-400 hover:underline">
                             Home
                         </Link>
                     </li>
                     <li>
-                        <Link to="/fares" className="px-6 py-2 text-gray-800 dark:text-white font-medium transition hover:text-violet-600">
+                        <Link to="/fares" className="px-6 py-2 text-gray-800 dark:text-white font-medium transition-all hover:text-blue-400 hover:underline">
                             Fares
                         </Link>
                     </li>
                     <li>
-                        <Link to="/compare" className="px-6 py-2 text-gray-800 dark:text-white font-medium transition hover:text-violet-600">
+                        <Link to="/metro-pass" className="px-6 py-2 text-gray-800 dark:text-white font-medium transition-all hover:text-blue-400 hover:underline">
+                            Metro Pass
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/compare" className="px-6 py-2 text-gray-800 dark:text-white font-medium transition-all hover:text-blue-400 hover:underline">
                             Compare
                         </Link>
                     </li>
                     <li>
-                        <Link to="/tickets" className="px-6 py-2 text-gray-800 dark:text-white font-medium transition hover:text-violet-600">
+                        <Link to="/tickets" className="px-6 py-2 text-gray-800 dark:text-white font-medium transition-all hover:text-blue-400 hover:underline">
                             Tickets
                         </Link>
                     </li>
-                    {!isAuthenticated ? (
-                        <li>
-                            <Link to="/login" className="bg-gradient-to-r from-blue-500 to-violet-600 text-white px-6 py-2 rounded-full font-medium shadow-md hover:scale-105 transition-transform">
-                                Login/Register
-                            </Link>
-                        </li>
-                    ) : (
-                        <li>
-                            <div className="flex items-center space-x-2 cursor-pointer" onClick={toggleProfileDropdown}>
-                            </div>
-                            {isProfileDropdownOpen && (
-                                <div className="mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50">
-                                    <Link to="/profile" className="block px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        Profile
-                                    </Link>
-                                    <button className="block w-full px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700" onClick={handleLogout}>
-                                        Logout
-                                    </button>
-                                </div>
-                            )}
-                        </li>
-                    )}
                 </ul>
             </div>
         </nav>
