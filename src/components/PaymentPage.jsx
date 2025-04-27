@@ -127,7 +127,7 @@ export default function PaymentPage() {
       
       dispatch(addBooking({ qrCode: qrCode, transactionId: transactionId }));
       setPaymentStatus("success");
-      setTimeout(() => navigate("/ticket-confirmation"), 2000);
+      navigate("/ticket-confirmation");
     } catch (error) {
       console.error(error);
       setPaymentStatus("error");
@@ -160,7 +160,7 @@ export default function PaymentPage() {
       
       dispatch(addBooking({ qrCode: qrCode, transactionId: transactionId }));
       setPaymentStatus("success");
-      setTimeout(() => navigate("/ticket-confirmation"), 1000);
+      navigate("/ticket-confirmation");
     } catch (e) {
       console.error(e);
       setPaymentStatus("error");
