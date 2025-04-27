@@ -31,7 +31,7 @@ export default function Fares() {
 
   return (
     <div>
-      <div className="bg-red-600 text-white text-center py-2 px-2 text-sm font-semibold rounded-lg w-max place-self-center mt-2">
+      <div className="bg-red-600 text-white text-center py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg mx-auto my-3 w-full max-w-md">
         This website is a development project and is not affiliated with Hyderabad Metro Rail. Do not use it for real bookings.
       </div>
       

@@ -8,14 +8,10 @@ import Register from "./components/Register";
 import Compare from "./components/Compare";
 import Tickets from "./components/Tickets";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
 import PaymentPage from "./components/PaymentPage";
 import TicketConfirmation from "./components/TicketConfirmation";
 import Profile from "./components/Profile";
 import NotFound from "./components/NotFound";
-
-const stripePromise = loadStripe(import.meta.env.VITE_API_STRIPE_TEST);
 
 function App() {
   return (
@@ -40,9 +36,7 @@ function App() {
         } />
         <Route path='/payment' element={
           <ProtectedRoute>
-            <Elements stripe={stripePromise}>
               <PaymentPage />
-            </Elements>
           </ProtectedRoute>
         } />
         <Route path='/ticket-confirmation' element={

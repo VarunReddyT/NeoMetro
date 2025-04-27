@@ -7,3 +7,14 @@ body{
     background-attachment: fixed;
     padding-top: 80px;
   }
+
+  /* Hide arrows in Chrome, Safari, Edge */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Hide arrows in Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}

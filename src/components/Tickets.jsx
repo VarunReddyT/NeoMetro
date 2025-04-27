@@ -51,9 +51,9 @@ export default function Tickets() {
     return (
 
         <div>
-            <div className="bg-red-600 text-white text-center py-2 px-2 text-sm font-semibold rounded-lg w-max place-self-center mt-2">
-                This website is a development project and is not affiliated with Hyderabad Metro Rail. Do not use it for real bookings.
-            </div>
+            <div className="bg-red-600 text-white text-center py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg mx-auto my-3 w-full max-w-md">
+        This website is a development project and is not affiliated with Hyderabad Metro Rail. Do not use it for real bookings.
+      </div>
 
             <div className="max-w-md mx-auto p-6 mt-2 bg-white shadow-lg rounded-lg">
 
@@ -95,7 +95,11 @@ export default function Tickets() {
                     )}
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition">
+                        disabled={!source || !destination || !date || fare === null}
+                        className={`w-full font-bold py-2 rounded-lg transition 
+                            ${!source || !destination || !date || fare === null
+                              ? 'bg-gray-400 text-gray-900 cursor-not-allowed'
+                              : 'bg-blue-600 hover:bg-blue-700 text-white'}`}>
                         Book Now
                     </button>
                 </form>

@@ -74,7 +74,7 @@ export default function MetroPass() {
 
   return (
     <div>
-      <div className="bg-red-600 text-white text-center py-2 px-2 text-sm font-semibold rounded-lg w-max place-self-center mt-2">
+      <div className="bg-red-600 text-white text-center py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg mx-auto my-3 w-full max-w-md">
         This website is a development project and is not affiliated with Hyderabad Metro Rail. Do not use it for real bookings.
       </div>
       {validLoading ? (
@@ -114,7 +114,7 @@ export default function MetroPass() {
                   <img src={`data:image/png;base64,${qrCode || validPass.qrCode}`} alt="QR Code" className="w-40 h-40 rounded-lg object-cover mt-4" />
                   <div className="mt-4 text-center">
                     <p className="text-lg font-medium">
-                      Validity: {new Date(validPass.validFrom).toLocaleDateString()} - {new Date(validPass.validTo).toLocaleDateString()}
+                      Validity: {new Date(validPass.validFrom).toLocaleDateString("en-GB")} - {new Date(validPass.validTo).toLocaleDateString("en-GB")}
                     </p>
                     <p className="text-lg font-medium">
                       Remaining Days: {calculateRemainingDays(validPass.validTo)} days
