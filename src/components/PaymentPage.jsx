@@ -70,7 +70,10 @@ export default function PaymentPage() {
     let formattedValue = value;
     
     if (name === "number") {
-      formattedValue = value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
+      formattedValue = value.replace(/\D/g, '');
+    
+      formattedValue = formattedValue.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+    
       if (formattedValue.length > 19) return;
     }
     
@@ -271,7 +274,7 @@ export default function PaymentPage() {
                     <div>
                       <label className="block text-gray-700 text-sm font-medium mb-2">Card Number</label>
                       <input
-                        type="number"
+                        type="text"
                         name="number"
                         value={cardDetails.number}
                         onChange={handleCardInputChange}
