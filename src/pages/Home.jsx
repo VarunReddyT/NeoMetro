@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Shield, Zap, Users, MapPin, CreditCard, Train } from "lucide-react";
+import ChatbotUI from "./ChatBot";
 
 const Button = ({ children, className = "", variant = "primary", size = "md", ...props }) => {
   const baseClasses =
@@ -173,6 +174,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <ChatbotUI />
     </div>
   );
 }
