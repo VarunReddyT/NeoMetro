@@ -65,7 +65,7 @@ const ChatbotUI = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("https://neo-metro-flask.vercel.app/api/chat", payload);
+      const response = await axios.post("https://neo-metro-flask.vercel.app/chat", payload);
       let botResponse;
       switch (selectedOption) {
         case "Check Fares":

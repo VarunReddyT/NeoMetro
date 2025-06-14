@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import Select from "../components/comps/Select.js";
+import Select from "../components/comps/Select.jsx";
 import { CreditCard, Clock } from "lucide-react";
 
 export default function Fares() {
