@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Select from "./comps/Select";
+import Select from "../components/comps/Select";
 
 export default function Compare() {
     const [view, setView] = useState(false);

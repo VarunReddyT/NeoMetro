@@ -154,9 +154,9 @@ router.put(`/:username/markasread`, async (req, res) => {
 
 router.post('/:username/generatemetropass', async (req, res) => {
     const { username } = req.params;
-    const { name, email, phone } = req.body;
+    const { name, email, phone, passType } = req.body;
 
-    if (!username || !name || !email || !phone) {
+    if (!username || !name || !email || !phone || !passType) {
         return res.status(400).send('Please provide all required fields.');
     }
 
@@ -179,11 +179,12 @@ router.post('/:username/generatemetropass', async (req, res) => {
             qrCode,
             validFrom,
             validTo,
+            passType
         };
 
         await user.save();
 
-        res.status(200).send({ qrCode, validFrom, validTo });
+        res.status(200).send({ qrCode, validFrom, validTo, passType });
     } catch (err) {
         console.error('Error generating/renewing metro pass:', err);
         res.status(500).send('Error generating/renewing metro pass. Please try again.');

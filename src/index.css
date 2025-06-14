@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body{
-    background: linear-gradient( #d0e7ff, #94b6fa);
-    background-attachment: fixed;
-    padding-top: 80px;
-  }
 
   /* Hide arrows in Chrome, Safari, Edge */
 input::-webkit-outer-spin-button,

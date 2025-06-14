@@ -60,6 +60,11 @@ const UserSchema = new Schema({
                 type: Date,
                 required: true,
             },
+            passType: {
+                type: String,
+                enum: ['monthly', 'quarterly'],
+                required: true,
+            }
         },
         default: null,
     }

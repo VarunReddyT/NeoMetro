@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, X, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import axios from 'axios';
-import Select from './comps/Select';
+import Select from '../components/comps/Select';
 
 const ChatbotUI = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,20 +65,19 @@ const ChatbotUI = () => {
     setIsLoading(true);
 
     try {
-      console.log(payload);
-      const response = await axios.post("https://neo-metro-flask.vercel.app/chat", payload);
-      console.log(response.data);
+      const response = await axios.post("https://neo-metro-flask.vercel.app/api/chat", payload);
+      let botResponse;
       switch (selectedOption) {
         case "Check Fares":
-          var botResponse = { id: messages.length + 2, text: `The fare from ${source} to ${destination} is ₹${response.data.fare}`, isBot: true };
+          botResponse = { id: messages.length + 2, text: `The fare from ${source} to ${destination} is ₹${response.data.fare}`, isBot: true };
           break;
         case "Nearest Places":
-          var botResponse = { id: messages.length + 2, text: response.data.response, isBot: true };
+          botResponse = { id: messages.length + 2, text: response.data.response, isBot: true };
           break;
         default:
-          var botResponse = { id: messages.length + 2, text: response.data.response, isBot: true };
+          botResponse = { id: messages.length + 2, text: response.data.response, isBot: true };
       }
-  
+
       setMessages(prevMessages => [...prevMessages, botResponse]);
     } catch (error) {
       console.error(error);

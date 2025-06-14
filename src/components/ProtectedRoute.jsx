@@ -38,13 +38,12 @@ export default function ProtectedRoute({ children }) {
                 </div>
             )}
             {showAlert && (
-                <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 place-items-center flex flex-col space-y-4 bg-white bg-opacity-90 p-4 rounded-lg shadow-lg z-50">
-                    <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-blue-600"></div>
-                    <p className="text-lg font-semibold text-center dark:text-gray-800"
-                    >Redirecting to login...</p>
+                <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center space-y-4 bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg z-50">
+                    <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-blue-600"></div>
+                    <p className="text-lg font-semibold text-center text-gray-800 dark:text-gray-300">
+                        Redirecting to login...
+                    </p>
                 </div>
-
-                
             )}
             {token && isTokenValid(token) ? children : null}
         </>

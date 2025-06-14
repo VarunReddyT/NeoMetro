@@ -14,7 +14,7 @@ export default function TicketConfirmation() {
                     read: false
                 };
                 try{
-                    await axios.put(`https://neo-metro-backend.vercel.app/api/users/${user.username}/addnotification`,
+                    await axios.post(`https://neo-metro-backend.vercel.app/api/notifications/${user.username}/add`,
                         notification
                     );
                     console.log('Notification sent successfully.');

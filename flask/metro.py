@@ -103,25 +103,25 @@ def calculate_path_distance(graph, path):
 
 def calculate_fare(dist):
     if dist <=2:
-        return 10
+        return 12
     elif dist>2 and dist <=4:
-        return 15
+        return 18
     elif dist>4 and dist<=6:
-        return 25
-    elif dist>6 and dist<=8:
         return 30
-    elif dist>8 and dist<=10:
-        return 35
-    elif dist>10 and dist<=14:
+    elif dist>6 and dist<=9:
         return 40
-    elif dist>14 and dist<=18:
-        return 45
-    elif dist>18 and dist<=22:
+    elif dist>9 and dist<=12:
         return 50
-    elif dist>22 and dist<=26:
+    elif dist>12 and dist<=15:
         return 55
-    else:
+    elif dist>15 and dist<=18:
         return 60
+    elif dist>18 and dist<=21:
+        return 66
+    elif dist>21 and dist<=24:
+        return 70
+    else:
+        return 75
 
 def get_path(paths, start, end):
     mid = []

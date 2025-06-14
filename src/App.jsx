@@ -1,17 +1,19 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./components/Home";
-import Navbar from "./components/Navbar";
-import Fares from "./components/Fares";
-import MetroPass from "./components/MetroPass";
+import Home from "./pages/Home";
+// import Navbar from "./components/Navbar";
+import Navbar from "./components/layout/Navbar";
+import Fares from "./pages/Fares";
+import MetroPass from "./pages/MetroPass";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Compare from "./components/Compare";
-import Tickets from "./components/Tickets";
+import Compare from "./pages/Compare";
+import Tickets from "./pages/Tickets";
 import ProtectedRoute from "./components/ProtectedRoute";
-import PaymentPage from "./components/PaymentPage";
-import TicketConfirmation from "./components/TicketConfirmation";
-import Profile from "./components/Profile";
+import PaymentPage from "./pages/PaymentPage";
+import TicketConfirmation from "./pages/TicketConfirmation";
+import Profile from "./pages/Profile";
 import NotFound from "./components/NotFound";
+import { Footer } from "./components/layout/Footer";
 
 function App() {
   return (
@@ -51,6 +53,7 @@ function App() {
         } />
 
       </Routes>
+      <Footer />
     </Router>
   );
 }

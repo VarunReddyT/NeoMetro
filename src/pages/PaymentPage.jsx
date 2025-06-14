@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { addBooking } from "./features/bookingSlicer";
+import { addBooking } from "../components/features/bookingSlicer";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function PaymentPage() {
@@ -32,30 +32,30 @@ export default function PaymentPage() {
 
   const getQrCode = async () => {
     try {
-      const qrResponse = await axios.get('https://neo-metro-flask.vercel.app/qrcode/ticket', {
-        params: {
-          start: booking.source,
-          end: booking.destination,
-        }
-      });
-      setQrCode(qrResponse.data.qrcode);
-      return qrResponse.data.qrcode; 
+        const qrResponse = await axios.get('https://neo-metro-flask.vercel.app/qrcode/ticket', {
+            params: {
+                start: booking.source,
+                end: booking.destination,
+            }
+        });
+        setQrCode(qrResponse.data.qrcode);
+        return qrResponse.data.qrcode; 
     } catch (e) {
-      console.error(e);
-      return null; 
+        console.error(e);
+        return null; 
     }
   };
 
   const getUpiQrCode = async () => {
     try {
-      setUpiLoading(true);
-      const response = await axios.get('https://neo-metro-flask.vercel.app/qrcode/gpay');
-      setUpiQrCode(response.data.qrcode);
+        setUpiLoading(true);
+        const response = await axios.get('https://neo-metro-flask.vercel.app/qrcode/gpay');
+        setUpiQrCode(response.data.qrcode);
     } catch (error) {
-      console.error("Error fetching UPI QR code:", error);
-      alert("Failed to generate UPI QR code. Please try again.");
+        console.error("Error fetching UPI QR code:", error);
+        alert("Failed to generate UPI QR code. Please try again.");
     } finally {
-      setUpiLoading(false);
+        setUpiLoading(false);
     }
   };
 
@@ -83,6 +83,10 @@ export default function PaymentPage() {
         .substring(0, 5);
     }
     
+    if (name === "name") {
+      formattedValue = value.substring(0, 30);
+    }
+
     setCardDetails(prev => ({
       ...prev,
       [name]: formattedValue
@@ -145,7 +149,7 @@ export default function PaymentPage() {
       const transactionId = generateTransactionId("upi");
       const qrCode = await getQrCode();
       
-      await axios.post('https://neo-metro-backend.vercel.app/api/tickets/bookedticket', {
+      await axios.post('https://neo-metro-backend.vercel.app/api/tickets/book', {
         username: booking.username,
         source: booking.source,
         destination: booking.destination,
@@ -172,9 +176,6 @@ export default function PaymentPage() {
 
   return (
     <div className="min-h-screen py-10 px-4">
-      <div className="bg-red-600 text-white text-center py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg mx-auto my-3 w-full max-w-md">
-        This website is a development project and is not affiliated with Hyderabad Metro Rail. Do not use it for real bookings.
-      </div>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-2xl text-white">
