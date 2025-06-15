@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neometroflask
+spec:
+  selector:
+    matchLabels:
+      app: neometroflask
+  template:
+    metadata:
+      labels:
+        app: neometroflask
+    spec:
+      containers:
+      - name: neometroflask
+        image: tvarun2014/neometroflask:latest
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+        ports:
+        - containerPort: 5000
+        envFrom:
+          - secretRef:
+              name: flask-env
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: neometroflask-service
+spec:
+  type: NodePort
+  selector:
+    app: neometroflask
+  ports:
+  - port: 5000
+    targetPort: 5000
+    nodePort: 30050

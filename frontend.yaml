@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neometrofrontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: neometrofrontend
+  template:
+    metadata:
+      labels:
+        app: neometrofrontend
+    spec:
+      containers:
+      - name: neometrofrontend
+        image: tvarun2014/neometrofrontend:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        envFrom:
+          - secretRef:
+              name: frontend-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: neometrofrontend-service
+spec:
+  type: NodePort
+  selector:
+    app: neometrofrontend
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30010
