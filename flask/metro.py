@@ -5,7 +5,6 @@ import networkx as nx
 import qrcode
 import base64
 from io import BytesIO
-import requests
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
