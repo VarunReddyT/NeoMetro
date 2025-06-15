@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addBooking } from "../components/features/bookingSlicer";
 import { motion, AnimatePresence } from "framer-motion";
+import backend from "../api/backend";
+import flask from "../api/flask";
 
 export default function PaymentPage() {
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -32,7 +33,7 @@ export default function PaymentPage() {
 
   const getQrCode = async () => {
     try {
-        const qrResponse = await axios.get('https://neo-metro-flask.vercel.app/qrcode/ticket', {
+        const qrResponse = await flask.get('/qrcode/ticket', {
             params: {
                 start: booking.source,
                 end: booking.destination,
@@ -49,7 +50,7 @@ export default function PaymentPage() {
   const getUpiQrCode = async () => {
     try {
         setUpiLoading(true);
-        const response = await axios.get('https://neo-metro-flask.vercel.app/qrcode/gpay');
+        const response = await flask.get('/qrcode/gpay');
         setUpiQrCode(response.data.qrcode);
     } catch (error) {
         console.error("Error fetching UPI QR code:", error);
@@ -115,8 +116,8 @@ export default function PaymentPage() {
           throw new Error("Please enter a valid CVV");
         }
       }
-      
-      await axios.post('https://neo-metro-backend.vercel.app/api/tickets/bookedticket', {
+
+      await backend.post('/api/tickets/bookedticket', {
         username: booking.username,
         source: booking.source,
         destination: booking.destination,
@@ -148,8 +149,8 @@ export default function PaymentPage() {
     try {
       const transactionId = generateTransactionId("upi");
       const qrCode = await getQrCode();
-      
-      await axios.post('https://neo-metro-backend.vercel.app/api/tickets/book', {
+
+      await backend.post('/api/tickets/book', {
         username: booking.username,
         source: booking.source,
         destination: booking.destination,

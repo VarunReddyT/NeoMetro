@@ -1,4 +1,4 @@
-import axios from "axios";
+import backend from "../api/backend";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -17,7 +17,7 @@ export default function Login() {
         e.preventDefault();
         setLoader(true);
         try {
-            const response = await axios.post("https://neo-metro-backend.vercel.app/api/users/login", {
+            const response = await backend.post("/api/users/login", {
                 username,
                 password,
             });

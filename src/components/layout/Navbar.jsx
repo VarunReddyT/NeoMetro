@@ -6,7 +6,7 @@ import { Menu, X, Bell, User, Train } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../features/authSlicer";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import backend from "../../api/backend";
 import {jwtDecode} from "jwt-decode";
 
 const Button = ({
@@ -94,8 +94,8 @@ export default function Navbar() {
   useEffect(() => {
     async function getnotifications() {
       if (isTokenValid(token)) {
-        await axios
-          .get(`https://neo-metro-backend.vercel.app/api/users/${userName}/getnotifications`)
+        await backend
+          .get(`/api/users/${userName}/getnotifications`)
           .then((response) => {
             setNotifications(response.data);
           })
@@ -144,8 +144,8 @@ export default function Navbar() {
   };
 
   const markAsRead = async (notificationId) => {
-    await axios
-      .put(`https://neo-metro-backend.vercel.app/api/users/${userName}/markasread`, { notificationId })
+    await backend
+      .put(`/api/users/${userName}/markasread`, { notificationId })
       .then(() => {
         setNotifications(
           notifications.map((notification) =>

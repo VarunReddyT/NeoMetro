@@ -5,8 +5,8 @@ const cors = require('cors');
 const userRoutes = require('./Routes/User.js'); 
 const ticketRoutes = require('./Routes/Ticket.js');
 const chatRoutes = require('./Routes/Chat.js');
-const stripeRoutes = require('./Routes/Stripe.js');
-const subsIdRoutes = require('./Routes/SubsId.js');
+// const stripeRoutes = require('./Routes/Stripe.js');
+// const subsIdRoutes = require('./Routes/SubsId.js');
 const mongoose = require('mongoose');
 
 const app = express();
@@ -24,15 +24,15 @@ mongoose.connect(process.env.MONGO_URI)
 );
 
 app.get('/', (req, res) => {
-    res.send('Welcome to Hyderabad Metro');
+    res.send('Welcome to Neo Metro');
 }
 );
 
 app.use('/api/users', userRoutes); 
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/chat',chatRoutes);
-app.use('/api/stripe', stripeRoutes);
-app.use('/api/subsid', subsIdRoutes);
+// app.use('/api/stripe', stripeRoutes);
+// app.use('/api/subsid', subsIdRoutes);
 
 
 app.listen(port, () => {

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, X, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
-import axios from 'axios';
 import Select from '../components/comps/Select';
+import flask from '../api/flask';
 
 const ChatbotUI = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,7 +65,7 @@ const ChatbotUI = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("https://neo-metro-flask.vercel.app/chat", payload);
+      const response = await flask.post("/chat", payload);
       let botResponse;
       switch (selectedOption) {
         case "Check Fares":

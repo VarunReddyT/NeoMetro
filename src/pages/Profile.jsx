@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import backend from "../api/backend";
 import { useSelector } from "react-redux";
 
 export default function ProfilePage() {
@@ -17,8 +17,8 @@ export default function ProfilePage() {
     async function fetchData() {
       try {
         const [userResponse, ticketsResponse] = await Promise.all([
-          axios.get(`https://neo-metro-backend.vercel.app/api/users/getuser?username=${user.username}`),
-          axios.get(`https://neo-metro-backend.vercel.app/api/tickets/getticket?username=${user.username}`)
+          backend.get(`/api/users/getuser?username=${user.username}`),
+          backend.get(`/api/tickets/getticket?username=${user.username}`)
         ]);
         setUserDetails(userResponse.data);
         setTickets(ticketsResponse.data);

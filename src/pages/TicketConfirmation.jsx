@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import axios from "axios";
+import backend from "../api/backend";
 
 export default function TicketConfirmation() {
     const ticketDetails = useSelector((state) => state.booking.booking[0]);
@@ -14,7 +14,7 @@ export default function TicketConfirmation() {
                     read: false
                 };
                 try{
-                    await axios.post(`https://neo-metro-backend.vercel.app/api/notifications/${user.username}/add`,
+                    await backend.post(`/api/notifications/${user.username}/add`,
                         notification
                     );
                     console.log('Notification sent successfully.');

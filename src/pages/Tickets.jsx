@@ -3,7 +3,7 @@ import Select from "../components/comps/Select";
 import { addBooking } from "../components/features/bookingSlicer";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import flask from "../api/flask";
 import { useSelector } from "react-redux";
 import { MapPin, CreditCard, Clock } from "lucide-react";
 
@@ -26,7 +26,7 @@ export default function Tickets() {
             try {
                 const encodedSource = encodeURIComponent(source);
                 const encodedDestination = encodeURIComponent(destination);
-                const response = await axios.get(`https://neo-metro-flask.vercel.app/path/${encodedSource}/${encodedDestination}`);
+                const response = await flask.get(`/path/${encodedSource}/${encodedDestination}`);
                 setFare(response.data.fare);
                 setDistance(response.data.distance);
             } catch (e) {

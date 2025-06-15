@@ -1,4 +1,4 @@
-import axios from "axios";
+import backend from "../api/backend";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -16,7 +16,7 @@ export default function Register() {
         e.preventDefault();
         setLoader(true);
         try {
-            await axios.post("https://neo-metro-backend.vercel.app/api/users/register", {
+            await backend.post("/api/users/register", {
                 name,
                 username,
                 password,

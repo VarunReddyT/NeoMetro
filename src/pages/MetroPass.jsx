@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { CreditCard, QrCode, Calendar, CheckCircle } from "lucide-react";
+import backend from "../api/backend";
 
 const Button = ({ children, className = "", variant = "primary", size = "md", loading = false, disabled, ...props }) => {
   const baseClasses =
@@ -80,8 +80,8 @@ export default function MetroPass() {
     async function checkMetroPass() {
       if (user?.username) {
         try {
-          const response = await axios.get(
-            `https://neo-metro-backend.vercel.app/api/users/${user.username}/checkmetropass`
+          const response = await backend.get(
+            `/api/users/${user.username}/checkmetropass`
           );
           if (response.data) {
             setValidPass(response.data);
@@ -126,8 +126,8 @@ export default function MetroPass() {
     setLoading(true);
     let type = passType === 1 ? "monthly" : "quarterly";
     try {
-      const response = await axios.post(
-        `https://neo-metro-backend.vercel.app/api/users/${user.username}/generatemetropass`,
+      const response = await backend.post(
+        `/api/users/${user.username}/generatemetropass`,
         { name, email, phone, passType: type }
       );
       setQrCode(response.data.qrCode);

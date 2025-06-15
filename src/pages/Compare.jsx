@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import flask from "../api/flask";
 import Select from "../components/comps/Select";
 
 export default function Compare() {
@@ -22,8 +22,8 @@ export default function Compare() {
         const totalExpenses = (parseInt(dailyDistance) / parseInt(mileage)) * parseFloat(petrolPrice);
         setTotalExpensesV(totalExpenses.toFixed(2));
         try {
-            const response = await axios.get(
-                `https://neo-metro-flask.vercel.app/path/${source}/${destination}`
+            const response = await flask.get(
+                `/path/${source}/${destination}`
             );
             const fareValue = response.data.fare;
             setFare(fareValue);

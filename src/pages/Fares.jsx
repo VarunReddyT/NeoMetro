@@ -1,4 +1,4 @@
-import axios from "axios";
+import flask from "../api/flask.js";
 import { useState } from "react";
 import Select from "../components/comps/Select.jsx";
 import { CreditCard, Clock } from "lucide-react";
@@ -25,13 +25,12 @@ export default function Fares() {
   const [loader, setLoader] = useState(false);
   const [view, setView] = useState(false);
 
-  // Updated API endpoint for fare calculation
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoader(true);
     try {
-      const response = await axios.get(
-        `https://neo-metro-flask.vercel.app/path/${encodeURIComponent(source)}/${encodeURIComponent(destination)}`
+      const response = await flask.get(
+        `/path/${encodeURIComponent(source)}/${encodeURIComponent(destination)}`
       );
       setPath(response.data.path);
       setFare(response.data.fare);
