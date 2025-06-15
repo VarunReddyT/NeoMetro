@@ -20,8 +20,8 @@ test/
 tests/
 
 # Environment files
-.env
-.env.*
+# .env
+# .env.*
 
 # Git and other VCS
 .git
