@@ -150,7 +150,7 @@ export default function PaymentPage() {
       const transactionId = generateTransactionId("upi");
       const qrCode = await getQrCode();
 
-      await backend.post('/api/tickets/book', {
+      await backend.post('/api/tickets/bookedticket', {
         username: booking.username,
         source: booking.source,
         destination: booking.destination,
