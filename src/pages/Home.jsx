@@ -99,13 +99,13 @@ export default function Home() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Link to="/metro-pass">
+              <Link to="/fares">
                 <Button
                   size="lg"
                   variant="outline"
                   className="border-white text-white hover:bg-white hover:text-metro-600 px-8 py-4"
                 >
-                  Get Metro Pass
+                  Check Fares
                 </Button>
               </Link>
             </div>
@@ -158,7 +158,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/tickets">
-              <Button size="lg" className="bg-white text-metro-600 hover:bg-gray-100 px-8 py-4">
+              <Button size="lg" className="bg-metro-500 text-metro-600 hover:bg-gray-100 px-8 py-4">
                 Book Your First Ride
               </Button>
             </Link>
