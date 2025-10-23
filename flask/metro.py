@@ -10,95 +10,96 @@ import os
 from dotenv import load_dotenv
 import re
 from pymongo import MongoClient
+from networkx.exception import NetworkXNoPath, NodeNotFound
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
+# MongoDB
 client = MongoClient(os.getenv("MONGODB_URI"))
 db = client["test"]
 stations = db["stations"]
 
+# Graph
 G = nx.Graph()
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-1.5-flash")
 
-stations_data = list(stations.find({},{'_id': 0}))
-
+stations_data = list(stations.find({}, {'_id': 0}))
 if not stations_data:
     print("No station data found in the database.")
 else:
     for station in stations_data:
-        G.add_edge(station['start'], station['end'], weight=station['distance'])
+        try:
+            start = station["start"]
+            end = station["end"]
+            dist = float(station["distance"])
+            G.add_edge(start, end, weight=dist)
+        except KeyError:
+            continue
 
 stations_list = list(G.nodes())
 
-def dfs_path(graph, start, goal):
-    stack = [(start, [start])]
-    while stack:
-        (vertex, path) = stack.pop()
-        for next in set(graph.neighbors(vertex)) - set(path):
-            if next == goal:
-                yield path + [next]
-            else:
-                stack.append((next, path + [next]))
-
 def calculate_path_distance(graph, path):
-    distance = 0
+    """Sum weights along a path list of nodes."""
+    distance = 0.0
     for i in range(len(path) - 1):
         distance += graph[path[i]][path[i + 1]]['weight']
     return distance
 
 def calculate_fare(dist):
-    if dist <=2:
+    if dist <= 2:
         return 12
-    elif dist>2 and dist <=4:
+    elif dist <= 4:
         return 18
-    elif dist>4 and dist<=6:
+    elif dist <= 6:
         return 30
-    elif dist>6 and dist<=9:
+    elif dist <= 9:
         return 40
-    elif dist>9 and dist<=12:
+    elif dist <= 12:
         return 50
-    elif dist>12 and dist<=15:
+    elif dist <= 15:
         return 55
-    elif dist>15 and dist<=18:
+    elif dist <= 18:
         return 60
-    elif dist>18 and dist<=21:
+    elif dist <= 21:
         return 66
-    elif dist>21 and dist<=24:
+    elif dist <= 24:
         return 70
     else:
         return 75
 
-def get_path(paths, start, end):
-    mid = []
-    distances = [calculate_path_distance(G, path) for path in paths]
-    min_distance_index = distances.index(min(distances))
-    min_distance_path = paths[min_distance_index]
-    min_distance = distances[min_distance_index]
-    min_distance = round(min_distance, 2)
-    fare = calculate_fare(min_distance)
+def get_path_from_nodes(path):
+    """Construct display path, distance and fare from a node list."""
+    dist = calculate_path_distance(G, path)
+    dist = round(dist, 2)
+    fare = calculate_fare(dist)
     mid_stations = {"Ameerpet", "Mg Bus Station", "Parade Ground"}
-    mid = [station for station in min_distance_path if station in mid_stations and station != start and station != end]
+    mid = [station for station in path if station in mid_stations and station != path[0] and station != path[-1]]
 
     if len(mid) == 0:
-        displayPath = start + " -> " + end
+        displayPath = path[0] + " -> " + path[-1]
     else:
-        displayPath = start + " -> " + " -> ".join(mid) + " -> "  + end
-    return jsonify({'path': displayPath, 'distance': min_distance, 'fare': fare})
+        displayPath = path[0] + " -> " + " -> ".join(mid) + " -> " + path[-1]
 
+    return jsonify({'path': displayPath, 'distance': dist, 'fare': fare})
+
+# ----------------- Routes -----------------
 @app.route('/path/<start>/<end>')
 def find_path(start, end):
     start = unquote(start)
     end = unquote(end)
-    paths = list(dfs_path(G, start, end))
-    if paths:
-        return get_path(paths, start, end)
-    else:
-        return jsonify({'error': 'No path found between {} and {}'.format(start, end)})
+    try:
+
+        shortest_path = nx.dijkstra_path(G, source=start, target=end, weight='weight')
+        return get_path_from_nodes(shortest_path)
+    except NodeNotFound:
+        return jsonify({'error': f'One or both stations not found: {start}, {end}'}), 404
+    except NetworkXNoPath:
+        return jsonify({'error': f'No path found between {start} and {end}'}), 404
 
 @app.route('/stations')
 def get_stations():
@@ -160,12 +161,13 @@ def chat():
         source, destination = stationsBody[0], stationsBody[1]
         source_encoded = unquote(source)
         destination_encoded = unquote(destination)
-
-        paths = list(dfs_path(G, source_encoded, destination_encoded))
-        if paths:
-            return get_path(paths, source_encoded, destination_encoded)
-        else:
-            return jsonify({'error': 'No path found between {} and {}'.format(source, destination)})
+        try:
+            shortest_path = nx.dijkstra_path(G, source=source_encoded, target=destination_encoded, weight='weight')
+            return get_path_from_nodes(shortest_path)
+        except NodeNotFound:
+            return jsonify({'error': f'One or both stations not found: {source_encoded}, {destination_encoded}'}), 404
+        except NetworkXNoPath:
+            return jsonify({'error': f'No path found between {source_encoded} and {destination_encoded}'}), 404
 
     if location:
         gemini_prompt = f"What are some famous places to visit near {location} Metro Station or area within a 5 km radius in Hyderabad? Provide a short and informative response."
