@@ -9,78 +9,29 @@ import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 import re
+from pymongo import MongoClient
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
+client = MongoClient(os.getenv("MONGODB_URI"))
+db = client["test"]
+stations = db["stations"]
+
 G = nx.Graph()
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-1.5-flash")
 
-stations = {
-    ('Miyapur', 'Jntu'): 1.8,
-    ('Jntu', 'Kphb Colony'): 1.4,
-    ('Kphb Colony', 'Kukatpally'): 1.5,
-    ('Kukatpally', 'Balanagar'): 1.4,
-    ('Balanagar', 'Moosapet'): 0.7,
-    ('Moosapet', 'Bharath Nagar'): 1.0,
-    ('Bharath Nagar', 'Erragadda'): 0.9,
-    ('Erragadda', 'Esi Hospital'): 1.2,
-    ('Esi Hospital', 'Sr Nagar'): 0.7,
-    ('Sr Nagar', 'Ameerpet'): 0.7,
-    ('Ameerpet', 'Panjagutta'): 1.1,
-    ('Panjagutta', 'Irrum Manzil'): 1.0,
-    ('Irrum Manzil', 'Khairatabad'): 1.2,
-    ('Khairatabad', 'Lakdikapol'): 1.1,
-    ('Lakdikapol', 'Assembly'): 1.0,
-    ('Assembly', 'Nampally'): 0.6,
-    ('Nampally', 'Gandhi Bhavan'): 0.8,
-    ('Gandhi Bhavan', 'Osmania Medical College'): 1.0,
-    ('Osmania Medical College', 'Mg Bus Station'): 0.6,
-    ('Mg Bus Station', 'Malakpet'): 1.0,
-    ('Malakpet', 'New Market'): 1.1,
-    ('New Market', 'Musarambhag'): 0.9,
-    ('Musarambhag', 'Dilsukhnagar'): 1.6,
-    ('Dilsukhnagar', 'Chaitanyapuri'): 1.0,
-    ('Chaitanyapuri', 'Victoria Memorial'): 1.3,
-    ('Victoria Memorial', 'Lb Nagar'): 1.4,
-    ('Raidurg', 'Hitec City'): 1.5,
-    ('Hitec City', 'Durgam Cheruvu'): 0.8,
-    ('Durgam Cheruvu', 'Madhapur'): 1.6,
-    ('Madhapur', 'Peddamma Gudi'): 1.2,
-    ('Peddamma Gudi', 'Jubilee Hills Check Post'): 0.7,
-    ('Jubilee Hills Check Post', 'Road No5 Jubilee Hills'): 1.2,
-    ('Road No5 Jubilee Hills', 'Yusufguda'): 0.9,
-    ('Yusufguda', 'Madhura Nagar'): 1.3,
-    ('Madhura Nagar', 'Ameerpet'): 0.8,
-    ('Ameerpet', 'Begumpet'): 1.5,
-    ('Begumpet', 'Prakash Nagar'): 1.5,
-    ('Prakash Nagar', 'Rasoolpura'): 1.1,
-    ('Rasoolpura', 'Paradise'): 1.0,
-    ('Paradise', 'Parade Ground'): 1.2,
-    ('Parade Ground', 'Secunderabad East'): 1.6,
-    ('Secunderabad East', 'Mettuguda'): 1.9,
-    ('Mettuguda', 'Tarnaka'): 1.2,
-    ('Tarnaka', 'Habsiguda'): 1.6,
-    ('Habsiguda', 'Ngri'): 0.9,
-    ('Ngri', 'Stadium'): 1.1,
-    ('Stadium', 'Uppal'): 1.1,
-    ('Uppal', 'Nagole'): 1.1,
-    ('Parade Ground', 'Secunderabad West'): 1.3,
-    ('Secunderabad West', 'Gandhi Hospital'): 1.3,
-    ('Gandhi Hospital', 'Musheerabad'): 0.9,
-    ('Musheerabad', 'Rtc X Roads'): 1.2,
-    ('Rtc X Roads', 'Chikkadpally'): 0.8,
-    ('Chikkadpally', 'Narayanaguda'): 0.9,
-    ('Narayanaguda', 'Sulthan Bazaar'): 1.3,
-    ('Sulthan Bazaar', 'Mg Bus Station'): 0.7
-}
+stations_data = list(stations.find({},{'_id': 0}))
 
-for (start, end), distance in stations.items():
-    G.add_edge(start, end, weight=distance)
+if not stations_data:
+    print("No station data found in the database.")
+else:
+    for station in stations_data:
+        G.add_edge(station['start'], station['end'], weight=station['distance'])
 
 stations_list = list(G.nodes())
 
