@@ -4,3 +4,4 @@ networkx==3.3
 qrcode==7.4.2
 python-dotenv
 google-generativeai
+pymongo
